@@ -57,6 +57,9 @@ def p_formula_or(p):
 def p_formula_implies(p):
     'formula : formula IMPLIES formula'
     p[0] = p[1] + '=>' + p[3]
+    print(p[1])
+    print(p[2])
+    print(p[3])
 
 def p_formula_equivalent(p):
     'formula : formula EQUIVALENT formula'

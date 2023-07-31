@@ -72,7 +72,10 @@ def p_formula_constant(p):
 
 # Manejo de errores sintácticos
 def p_error(p):
-    print("Error de sintaxis en la entrada:", p)
+    if p is None:
+        print("Error: La expresión está incompleta. Se esperaba más contenido.")
+    else:
+        print(f"Error de sintaxis en la posición {p.lexpos}: Caracter '{p.value[0]}' no esperado.")
 
 # Crear el parser
 parser = yacc.yacc()
@@ -100,9 +103,9 @@ if __name__ == '__main__':
             if result is None:
                 is_well_formed = False
 
-            # Imprimir el resultado solo si es bien formada
+            # Imprimir el resultado en verde si es bien formada, en rojo si es mal formada
             if is_well_formed:
-                print_green("Expresión bien formada:" + result)
+                print_green("Expresión bien formada: " + result)
             else:
                 print_red("Expresión mal formada.")
 

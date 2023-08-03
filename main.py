@@ -49,34 +49,46 @@ G = nx.DiGraph()
 def p_formula_variable(p):
     'formula : VARIABLE'
     p[0] = p[1]
+    G.add_node(p[0])
 
 
 def p_formula_negation(p):
     'formula : NEGATION formula'
     p[0] = '~' + p[2]
+    G.add_node("~")
+    G.add_edge("~", p[2])
 
 
 def p_formula_and(p):
     'formula : formula AND formula'
     p[0] = p[1] + '^' + p[3]
+    G.add_node("^")
+    G.add_edge("^", p[1])
+    G.add_edge("^", p[3])
 
 
 def p_formula_or(p):
     'formula : formula OR formula'
     p[0] = p[1] + 'o' + p[3]
+    G.add_node("o")
+    G.add_edge("o", p[1])
+    G.add_edge("o", p[3])
 
 
 def p_formula_implies(p):
     'formula : formula IMPLIES formula'
     p[0] = p[1] + '=>' + p[3]
-    print(p[1])
-    print(p[2])
-    print(p[3])
+    G.add_node("=>")
+    G.add_edge("=>", p[1])
+    G.add_edge("=>", p[3])
 
 
 def p_formula_equivalent(p):
     'formula : formula EQUIVALENT formula'
     p[0] = p[1] + '<=>' + p[3]
+    G.add_node("<=>")
+    G.add_edge("<=>", p[1])
+    G.add_edge("<=>", p[3])
 
 
 def p_formula_parentheses(p):
@@ -87,6 +99,7 @@ def p_formula_parentheses(p):
 def p_formula_constant(p):
     'formula : CONSTANT'
     p[0] = p[1]
+    G.add_node(p[0])
 
 
 # Manejo de errores sintácticos
@@ -130,9 +143,18 @@ if __name__ == '__main__':
             if is_well_formed:
                 print_green("Expresión bien formada: " + result)
 
+                # mostrar nodos
+                print(G.nodes())
+
+                # mostrar aristas
+                print(G.edges())
+
                 # Mostrar el grafo
-                nx.draw_networkx(G, with_labels=True, arrows=True)
+                nx.draw(G, with_labels=True)
                 plt.show()
+
+                # Limpiar el grafo
+                G.clear()
             else:
                 print_red("Expresión mal formada.")
 

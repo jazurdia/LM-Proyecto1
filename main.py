@@ -49,7 +49,7 @@ def p_formula_variable(p):
     'formula : VARIABLE'
     global contador
     contador += 1
-    p[0] = p[1] + str(contador)
+    p[0] = p[1] + str(contador * " ")
     print(p[0])
     G.add_node(p[0])
 

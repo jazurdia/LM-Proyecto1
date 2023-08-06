@@ -44,11 +44,12 @@ lexer = lex.lex()
 # Crear el grafo
 G = nx.DiGraph()
 
-
 # Definir las reglas gramaticales de L
 def p_formula_variable(p):
     'formula : VARIABLE'
-    p[0] = p[1]
+    global contador
+    contador += 1
+    p[0] = p[1] + str(contador)
     print(p[0])
     G.add_node(p[0])
 
@@ -140,7 +141,9 @@ def print_red(text):
 
 
 if __name__ == '__main__':
+    # Inicializar el contador
     while True:
+        contador = 0
         try:
             # Leer la entrada desde el usuario
             input_expr = input('Ingrese una expresión del cálculo proposicional (L): ')

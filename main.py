@@ -2,6 +2,7 @@ import ply.lex as lex
 import ply.yacc as yacc
 import networkx as nx
 import matplotlib.pyplot as plt
+import pygraphviz as pgv
 
 # Definir el alfabeto de L
 # Tokens (palabras clave)
@@ -43,6 +44,11 @@ lexer = lex.lex()
 
 # Crear el grafo
 G = nx.DiGraph()
+options = {
+    'node_size': 750,
+    'width': 2,
+}
+
 
 # Definir las reglas gramaticales de L
 def p_formula_variable(p):
@@ -50,7 +56,7 @@ def p_formula_variable(p):
     global contador
     contador += 1
     p[0] = p[1] + str(contador * " ")
-    print(p[0])
+    # print(p[0])
     G.add_node(p[0])
 
 
@@ -58,7 +64,7 @@ def p_formula_negation(p):
     'formula : NEGATION formula'
     # p[0] = '~' + p[2]
     p[0] = '~'
-    print(p[0])
+    # print(p[0])
     G.add_node(p[0])
 
 
@@ -66,7 +72,7 @@ def p_formula_and(p):
     'formula : formula AND formula'
     # p[0] = p[1] + '^' + p[3]
     p[0] = '^'
-    print(p[0])
+    # print(p[0])
     G.add_node(p[0])
     G.add_edge(p[0], p[1])
     G.add_edge(p[0], p[3])
@@ -76,7 +82,7 @@ def p_formula_or(p):
     'formula : formula OR formula'
     # p[0] = p[1] + 'o' + p[3]
     p[0] = 'o'
-    print(p[0])
+    # print(p[0])
     G.add_node(p[0])
     G.add_edge(p[0], p[1])
     G.add_edge(p[0], p[3])
@@ -86,7 +92,7 @@ def p_formula_implies(p):
     'formula : formula IMPLIES formula'
     # p[0] = p[1] + '=>' + p[3]
     p[0] = '=>'
-    print(p[0])
+    # print(p[0])
     G.add_node(p[0])
     G.add_edge(p[0], p[1])
     G.add_edge(p[0], p[3])
@@ -96,7 +102,7 @@ def p_formula_equivalent(p):
     'formula : formula EQUIVALENT formula'
     # p[0] = p[1] + '<=>' + p[3]
     p[0] = '<=>'
-    print(p[0])
+    # print(p[0])
     G.add_node(p[0])
     G.add_edge(p[0], p[1])
     G.add_edge(p[0], p[3])
@@ -114,7 +120,7 @@ def p_formula_parentheses(p):
 def p_formula_constant(p):
     'formula : CONSTANT'
     p[0] = p[1]
-    print(p[0])
+    # print(p[0])
     G.add_node(p[0])
 
 
@@ -138,6 +144,18 @@ def print_green(text):
 # Función para imprimir el mensaje en rojo
 def print_red(text):
     print("\033[91m" + text + "\033[0m")
+
+
+# Función para generar el grafo dirigido con posiciones
+def generate_digraph(graph, node, positions):
+    if node not in graph.nodes():
+        graph.add_node(node)
+        if node not in positions:
+            positions[node] = (0, 0)  # Posición predeterminada para nuevos nodos
+    for neighbor in graph.neighbors(node):
+        if neighbor not in positions:
+            positions[neighbor] = (0, 0)
+        generate_digraph(graph, neighbor, positions)
 
 
 if __name__ == '__main__':
@@ -167,8 +185,17 @@ if __name__ == '__main__':
                 # mostrar aristas
                 print(G.edges())
 
-                # Mostrar el grafo
-                nx.draw(G, with_labels=True)
+                # Calcular posiciones
+                positions = nx.nx_agraph.graphviz_layout(G, prog='dot')
+                # Generar grafo dirigido con posiciones
+                dg = pgv.AGraph(directed=True)
+                generate_digraph(G, "=>", positions)
+                dg.add_edges_from(G.edges())
+
+                # Dibujar el grafo dirigido con posiciones
+                nx.draw_networkx_labels(G, positions, font_size=16)
+                nx.draw_networkx_edges(G, positions)
+                plt.axis("off")
                 plt.show()
 
                 # Limpiar el grafo

@@ -180,10 +180,10 @@ if __name__ == '__main__':
                 print_green("Expresión bien formada")
 
                 # mostrar nodos
-                print(G.nodes())
+                # print(G.nodes())
 
                 # mostrar aristas
-                print(G.edges())
+                # print(G.edges())
 
                 # Calcular posiciones
                 positions = nx.nx_agraph.graphviz_layout(G, prog='dot')
